@@ -1,100 +1,75 @@
-from fastapi import APIRouter, HTTPException
-from passlib.context import CryptContext
+from fastapi import APIRouter, Depends, HTTPException, status
+from fastapi.security import OAuth2PasswordRequestForm
 from sqlalchemy.orm import Session
+from passlib.context import CryptContext
+from pydantic import BaseModel, EmailStr
+from datetime import datetime
 
-from app.auth.models import (
-    UserRegister,
-    UserLogin,
-    TokenResponse
-)
+from app.db.database import get_db
+from app.db.models import User, RoleEnum
+from app.auth.jwt import create_access_token, get_current_user
 
-from app.auth.jwt import create_access_token
-from app.db.database import SessionLocal
-from app.db.models import User
+router = APIRouter(prefix="/auth", tags=["auth"])
+pwd_ctx = CryptContext(schemes=["bcrypt"], deprecated="auto")
 
-router = APIRouter(
-    prefix="/auth",
-    tags=["auth"]
-)
+# ── Pydantic schemas ──────────────────────────────────────────────────────────
 
-pwd_context = CryptContext(
-    schemes=["bcrypt"],
-    deprecated="auto"
-)
+class RegisterRequest(BaseModel):
+    email: EmailStr
+    username: str
+    password: str
+    role: RoleEnum = RoleEnum.employee
 
+class UserOut(BaseModel):
+    id: str
+    email: str
+    username: str
+    role: RoleEnum
+    is_active: bool
+    created_at: datetime
 
-@router.post("/register")
-def register(user: UserRegister):
+    class Config:
+        from_attributes = True
 
-    db: Session = SessionLocal()
+class TokenOut(BaseModel):
+    access_token: str
+    token_type: str = "bearer"
+    user: UserOut
 
-    existing = db.query(User).filter(
-        User.username == user.username
-    ).first()
+# ── Endpoints ─────────────────────────────────────────────────────────────────
 
-    if existing:
-        raise HTTPException(
-            status_code=400,
-            detail="Username already exists"
-        )
+@router.post("/register", response_model=UserOut, status_code=201)
+def register(req: RegisterRequest, db: Session = Depends(get_db)):
+    if db.query(User).filter(User.email == req.email).first():
+        raise HTTPException(status_code=400, detail="Email already registered")
+    if db.query(User).filter(User.username == req.username).first():
+        raise HTTPException(status_code=400, detail="Username already taken")
 
-    new_user = User(
-        email=user.email,
-        username=user.username,
-        hashed_password=pwd_context.hash(user.password),
-        role=user.role
+    user = User(
+        email=req.email,
+        username=req.username,
+        hashed_pw=pwd_ctx.hash(req.password),
+        role=req.role,
     )
-
-    db.add(new_user)
+    db.add(user)
     db.commit()
-    db.refresh(new_user)
+    db.refresh(user)
+    return user
 
-    return {
-        "message": "User registered successfully"
-    }
-
-
-@router.post(
-    "/login",
-    response_model=TokenResponse
-)
-def login(user: UserLogin):
-
-    db: Session = SessionLocal()
-
-    db_user = db.query(User).filter(
-        User.username == user.username
-    ).first()
-
-    if not db_user:
+@router.post("/login", response_model=TokenOut)
+def login(form: OAuth2PasswordRequestForm = Depends(), db: Session = Depends(get_db)):
+    user = db.query(User).filter(User.username == form.username).first()
+    if not user or not pwd_ctx.verify(form.password, user.hashed_pw):
         raise HTTPException(
-            status_code=401,
-            detail="Invalid credentials"
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Invalid username or password"
         )
+    if not user.is_active:
+        raise HTTPException(status_code=400, detail="Account is deactivated")
 
-    if not pwd_context.verify(
-        user.password,
-        db_user.hashed_password
-    ):
-        raise HTTPException(
-            status_code=401,
-            detail="Invalid credentials"
-        )
+    token = create_access_token({"sub": user.id, "role": user.role})
+    return {"access_token": token, "token_type": "bearer", "user": user}
 
-    token = create_access_token(
-        {
-            "sub": db_user.username,
-            "role": db_user.role
-        }
-    )
-
-    return {
-        "access_token": token
-    }
-
-
-@router.get("/me")
-def me():
-    return {
-        "message": "Authentication working"
-    }
+@router.get("/me", response_model=UserOut)
+def me(current_user: User = Depends(get_current_user)):
+    return current_user

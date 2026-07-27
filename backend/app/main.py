@@ -12,18 +12,16 @@ app = FastAPI(
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://localhost:5173"],  # Vite dev server
+    allow_origins=["http://localhost:5173"],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
 )
 
-# Create DB tables on startup
 @app.on_event("startup")
 def startup():
     create_tables()
 
-# Mount routers
 app.include_router(auth_router)
 
 @app.get("/health")
