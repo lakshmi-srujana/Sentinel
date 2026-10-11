@@ -2,7 +2,7 @@ from fastapi import APIRouter, Depends, HTTPException, status
 from fastapi.security import OAuth2PasswordRequestForm
 from sqlalchemy.orm import Session
 from passlib.context import CryptContext
-from pydantic import BaseModel, EmailStr
+from pydantic import BaseModel, EmailStr, ConfigDict
 from datetime import datetime
 
 from app.db.database import get_db
@@ -19,17 +19,20 @@ class RegisterRequest(BaseModel):
     username: str
     password: str
     role: RoleEnum = RoleEnum.employee
+    department: str = "Engineering"
+    org_id: str = "org_default"
 
 class UserOut(BaseModel):
     id: str
     email: str
     username: str
     role: RoleEnum
+    department: str
+    org_id: str
     is_active: bool
     created_at: datetime
 
-    class Config:
-        from_attributes = True
+    model_config = ConfigDict(from_attributes=True)
 
 class TokenOut(BaseModel):
     access_token: str
@@ -50,6 +53,8 @@ def register(req: RegisterRequest, db: Session = Depends(get_db)):
         username=req.username,
         hashed_pw=pwd_ctx.hash(req.password),
         role=req.role,
+        department=req.department,
+        org_id=req.org_id
     )
     db.add(user)
     db.commit()
@@ -67,7 +72,8 @@ def login(form: OAuth2PasswordRequestForm = Depends(), db: Session = Depends(get
     if not user.is_active:
         raise HTTPException(status_code=400, detail="Account is deactivated")
 
-    token = create_access_token({"sub": user.id, "role": user.role})
+    role_val = user.role.value if hasattr(user.role, "value") else str(user.role)
+    token = create_access_token({"sub": user.id, "role": role_val, "org_id": user.org_id})
     return {"access_token": token, "token_type": "bearer", "user": user}
 
 @router.get("/me", response_model=UserOut)
