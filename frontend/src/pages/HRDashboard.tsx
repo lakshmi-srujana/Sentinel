@@ -27,7 +27,7 @@ export const HRDashboard: React.FC = () => {
   if (error || !data) {
     return (
       <div className="card" style={{ textAlign: 'center', padding: '40px' }}>
-        <div style={{ color: '#f87171', fontSize: '1.1rem', fontWeight: 600 }}>{error || 'Unable to load analytics'}</div>
+        <div style={{ color: 'var(--color-danger)', fontSize: '1.1rem', fontWeight: 600 }}>{error || 'Unable to load analytics'}</div>
       </div>
     );
   }
@@ -56,37 +56,37 @@ export const HRDashboard: React.FC = () => {
 
         {/* Top Summary Metrics */}
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '16px', margin: '20px 0' }}>
-          <div style={{ background: 'rgba(255,255,255,0.02)', border: '1px solid var(--bg-card-border)', borderRadius: '10px', padding: '16px' }}>
+          <div style={{ background: 'var(--bg-card-inner)', border: '1px solid var(--bg-card-border)', borderRadius: '10px', padding: '16px' }}>
             <div style={{ fontSize: '0.8rem', color: 'var(--text-muted)', textTransform: 'uppercase', fontWeight: 600 }}>Total Governed Queries</div>
-            <div style={{ fontSize: '1.8rem', fontWeight: 800, color: '#fff', marginTop: '8px' }}>{data.total_prompts}</div>
+            <div style={{ fontSize: '1.8rem', fontWeight: 800, color: 'var(--text-heading)', marginTop: '8px' }}>{data.total_prompts}</div>
           </div>
-          <div style={{ background: 'rgba(255,255,255,0.02)', border: '1px solid var(--bg-card-border)', borderRadius: '10px', padding: '16px' }}>
+          <div style={{ background: 'var(--bg-card-inner)', border: '1px solid var(--bg-card-border)', borderRadius: '10px', padding: '16px' }}>
             <div style={{ fontSize: '0.8rem', color: 'var(--text-muted)', textTransform: 'uppercase', fontWeight: 600 }}>Avg Org Risk Score</div>
-            <div style={{ fontSize: '1.8rem', fontWeight: 800, color: '#38bdf8', marginTop: '8px' }}>{data.average_risk_score}/100</div>
+            <div style={{ fontSize: '1.8rem', fontWeight: 800, color: 'var(--primary)', marginTop: '8px' }}>{data.average_risk_score}/100</div>
           </div>
-          <div style={{ background: 'rgba(255,255,255,0.02)', border: '1px solid var(--bg-card-border)', borderRadius: '10px', padding: '16px' }}>
+          <div style={{ background: 'var(--bg-card-inner)', border: '1px solid var(--bg-card-border)', borderRadius: '10px', padding: '16px' }}>
             <div style={{ fontSize: '0.8rem', color: 'var(--text-muted)', textTransform: 'uppercase', fontWeight: 600 }}>Sanitized Redactions</div>
-            <div style={{ fontSize: '1.8rem', fontWeight: 800, color: '#f59e0b', marginTop: '8px' }}>{actions.redact}</div>
+            <div style={{ fontSize: '1.8rem', fontWeight: 800, color: 'var(--color-warning)', marginTop: '8px' }}>{actions.redact}</div>
           </div>
-          <div style={{ background: 'rgba(255,255,255,0.02)', border: '1px solid var(--bg-card-border)', borderRadius: '10px', padding: '16px' }}>
+          <div style={{ background: 'var(--bg-card-inner)', border: '1px solid var(--bg-card-border)', borderRadius: '10px', padding: '16px' }}>
             <div style={{ fontSize: '0.8rem', color: 'var(--text-muted)', textTransform: 'uppercase', fontWeight: 600 }}>Security Blocks</div>
-            <div style={{ fontSize: '1.8rem', fontWeight: 800, color: '#ef4444', marginTop: '8px' }}>{actions.blocked}</div>
+            <div style={{ fontSize: '1.8rem', fontWeight: 800, color: 'var(--color-danger)', marginTop: '8px' }}>{actions.blocked}</div>
           </div>
         </div>
 
         {/* Policy Distribution Bar */}
         <div style={{ margin: '24px 0' }}>
           <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '8px', fontSize: '0.85rem' }}>
-            <span style={{ fontWeight: 600 }}>Policy Action Breakdown</span>
+            <span style={{ fontWeight: 600, color: 'var(--text-heading)' }}>Policy Action Breakdown</span>
             <span style={{ color: 'var(--text-muted)' }}>Distribution across all departments</span>
           </div>
-          <div style={{ display: 'flex', height: '14px', borderRadius: '7px', overflow: 'hidden', background: 'rgba(255,255,255,0.1)' }}>
+          <div style={{ display: 'flex', height: '14px', borderRadius: '7px', overflow: 'hidden', background: 'var(--bg-card-inner)', border: '1px solid var(--bg-card-border)' }}>
             <div style={{ width: `${approvedPct}%`, background: '#10b981' }} title={`Approved: ${approvedPct}%`} />
             <div style={{ width: `${redactPct}%`, background: '#38bdf8' }} title={`Redacted: ${redactPct}%`} />
             <div style={{ width: `${escalatePct}%`, background: '#f59e0b' }} title={`Escalated: ${escalatePct}%`} />
             <div style={{ width: `${blockedPct}%`, background: '#ef4444' }} title={`Blocked: ${blockedPct}%`} />
           </div>
-          <div style={{ display: 'flex', gap: '20px', marginTop: '12px', fontSize: '0.8rem', color: 'var(--text-muted)' }}>
+          <div style={{ display: 'flex', gap: '20px', marginTop: '12px', fontSize: '0.8rem', color: 'var(--text-muted)', flexWrap: 'wrap' }}>
             <span style={{ display: 'flex', alignItems: 'center', gap: '6px' }}><span style={{ width: '10px', height: '10px', background: '#10b981', borderRadius: '2px' }} /> Approved ({actions.approved})</span>
             <span style={{ display: 'flex', alignItems: 'center', gap: '6px' }}><span style={{ width: '10px', height: '10px', background: '#38bdf8', borderRadius: '2px' }} /> Redacted ({actions.redact})</span>
             <span style={{ display: 'flex', alignItems: 'center', gap: '6px' }}><span style={{ width: '10px', height: '10px', background: '#f59e0b', borderRadius: '2px' }} /> Escalated ({actions.escalate})</span>
@@ -96,43 +96,45 @@ export const HRDashboard: React.FC = () => {
 
         {/* Department Usage Table */}
         <div style={{ marginTop: '32px' }}>
-          <h2 style={{ fontSize: '1.1rem', fontWeight: 700, marginBottom: '14px' }}>Department AI Activity & Risk Heatmap</h2>
-          <table className="table">
-            <thead>
-              <tr>
-                <th>Department</th>
-                <th>Prompts Governed</th>
-                <th>Average Risk Score</th>
-                <th>Governance Status</th>
-              </tr>
-            </thead>
-            <tbody>
-              {data.department_stats && data.department_stats.length > 0 ? (
-                data.department_stats.map((dept, idx) => (
-                  <tr key={idx}>
-                    <td style={{ fontWeight: 600, color: '#fff' }}>{dept.department}</td>
-                    <td>{dept.prompt_count}</td>
-                    <td>
-                      <span style={{ color: dept.avg_risk_score > 50 ? '#f59e0b' : '#38bdf8', fontWeight: 700 }}>
-                        {dept.avg_risk_score}/100
-                      </span>
-                    </td>
-                    <td>
-                      <span className={`action-badge ${dept.avg_risk_score > 50 ? 'action-escalate' : 'action-approved'}`} style={{ fontSize: '0.7rem' }}>
-                        {dept.avg_risk_score > 50 ? 'Elevated Monitoring' : 'Compliant'}
-                      </span>
+          <h2 style={{ fontSize: '1.1rem', fontWeight: 700, marginBottom: '14px', color: 'var(--text-heading)' }}>Department AI Activity & Risk Heatmap</h2>
+          <div className="table-container">
+            <table className="data-table">
+              <thead>
+                <tr>
+                  <th>Department</th>
+                  <th>Prompts Governed</th>
+                  <th>Average Risk Score</th>
+                  <th>Governance Status</th>
+                </tr>
+              </thead>
+              <tbody>
+                {data.department_stats && data.department_stats.length > 0 ? (
+                  data.department_stats.map((dept, idx) => (
+                    <tr key={idx}>
+                      <td style={{ fontWeight: 600, color: 'var(--text-heading)' }}>{dept.department}</td>
+                      <td>{dept.prompt_count}</td>
+                      <td>
+                        <span style={{ color: dept.avg_risk_score > 50 ? 'var(--color-warning)' : 'var(--primary)', fontWeight: 700 }}>
+                          {dept.avg_risk_score}/100
+                        </span>
+                      </td>
+                      <td>
+                        <span className={`action-badge ${dept.avg_risk_score > 50 ? 'action-escalated' : 'action-approved'}`} style={{ fontSize: '0.7rem' }}>
+                          {dept.avg_risk_score > 50 ? 'Elevated Monitoring' : 'Compliant'}
+                        </span>
+                      </td>
+                    </tr>
+                  ))
+                ) : (
+                  <tr>
+                    <td colSpan={4} style={{ textAlign: 'center', color: 'var(--text-muted)', padding: '24px' }}>
+                      No department data logged yet.
                     </td>
                   </tr>
-                ))
-              ) : (
-                <tr>
-                  <td colSpan={4} style={{ textAlign: 'center', color: 'var(--text-muted)', padding: '24px' }}>
-                    No department data logged yet.
-                  </td>
-                </tr>
-              )}
-            </tbody>
-          </table>
+                )}
+              </tbody>
+            </table>
+          </div>
         </div>
       </div>
     </div>

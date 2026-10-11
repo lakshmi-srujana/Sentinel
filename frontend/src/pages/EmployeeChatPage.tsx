@@ -125,7 +125,7 @@ export const EmployeeChatPage: React.FC = () => {
               rows={4}
             />
             {error && (
-              <div style={{ color: '#f87171', fontSize: '0.85rem', marginTop: '8px' }}>
+              <div style={{ color: 'var(--color-danger)', fontSize: '0.85rem', marginTop: '8px' }}>
                 {error}
               </div>
             )}
@@ -155,23 +155,25 @@ export const EmployeeChatPage: React.FC = () => {
             </div>
 
             {/* Risk Gauge */}
-            <div className="risk-bar-container">
+            <div className="risk-bar-container" style={{ background: 'var(--bg-card-inner)', height: '8px', borderRadius: '4px', overflow: 'hidden' }}>
               <div
                 className="risk-bar-fill"
                 style={{
+                  height: '100%',
                   width: `${Math.max(5, result.risk_score)}%`,
                   background: getScoreColor(result.risk_score),
+                  transition: 'width 0.4s ease',
                 }}
               />
             </div>
 
             {/* Risk Factors */}
             {result.risk_factors && result.risk_factors.length > 0 && (
-              <div style={{ margin: '14px 0', padding: '10px 14px', background: 'rgba(0,0,0,0.2)', borderRadius: '8px' }}>
+              <div style={{ margin: '14px 0', padding: '10px 14px', background: 'var(--bg-card-inner)', border: '1px solid var(--bg-card-border)', borderRadius: '8px' }}>
                 <div style={{ fontSize: '0.75rem', fontWeight: 700, color: 'var(--text-muted)', textTransform: 'uppercase', marginBottom: '6px' }}>
                   Risk Factors & Detections:
                 </div>
-                <ul style={{ paddingLeft: '18px', fontSize: '0.85rem', color: '#e2e8f0', display: 'flex', flexDirection: 'column', gap: '4px' }}>
+                <ul style={{ paddingLeft: '18px', fontSize: '0.85rem', color: 'var(--text-secondary)', display: 'flex', flexDirection: 'column', gap: '4px' }}>
                   {result.risk_factors.map((factor, i) => (
                     <li key={i}>{factor}</li>
                   ))}
@@ -184,7 +186,7 @@ export const EmployeeChatPage: React.FC = () => {
               <div style={{ fontSize: '0.75rem', fontWeight: 700, color: 'var(--text-muted)', textTransform: 'uppercase', marginBottom: '6px' }}>
                 Sanitized Outbound Prompt (Dispatched to Model):
               </div>
-              <div style={{ background: 'rgba(10, 13, 20, 0.7)', padding: '12px', borderRadius: '8px', border: '1px solid var(--bg-card-border)', fontSize: '0.85rem', fontFamily: 'monospace', color: '#38bdf8' }}>
+              <div style={{ background: 'var(--bg-card-inner)', padding: '12px', borderRadius: '8px', border: '1px solid var(--bg-card-border)', fontSize: '0.85rem', fontFamily: 'monospace', color: 'var(--primary)' }}>
                 {result.masked_preview}
               </div>
             </div>
@@ -195,17 +197,17 @@ export const EmployeeChatPage: React.FC = () => {
                 {result.action === 'blocked' ? 'Gateway Block Reason:' : result.action === 'escalate' ? 'Escalation Status:' : 'Model Response (Unmasked for Authorized User):'}
               </div>
               {result.action === 'blocked' && (
-                <div style={{ background: 'rgba(239, 68, 68, 0.1)', border: '1px solid rgba(239, 68, 68, 0.3)', color: '#fca5a5', padding: '12px 16px', borderRadius: '8px', fontSize: '0.9rem' }}>
+                <div style={{ background: 'var(--color-danger-bg)', border: '1px solid var(--color-danger-border)', color: 'var(--color-danger)', padding: '12px 16px', borderRadius: '8px', fontSize: '0.9rem' }}>
                   🚫 {result.reason}
                 </div>
               )}
               {result.action === 'escalate' && (
-                <div style={{ background: 'rgba(245, 158, 11, 0.1)', border: '1px solid rgba(245, 158, 11, 0.3)', color: '#fcd34d', padding: '12px 16px', borderRadius: '8px', fontSize: '0.9rem' }}>
+                <div style={{ background: 'var(--color-warning-bg)', border: '1px solid var(--color-warning-border)', color: 'var(--color-warning)', padding: '12px 16px', borderRadius: '8px', fontSize: '0.9rem' }}>
                   ⏳ <strong>Pending Manager Review:</strong> {result.reason}
                 </div>
               )}
               {result.llm_response && (
-                <div style={{ background: 'rgba(16, 185, 129, 0.05)', border: '1px solid rgba(16, 185, 129, 0.2)', padding: '16px', borderRadius: '8px', color: '#f1f5f9', fontSize: '0.9rem', lineHeight: '1.6' }}>
+                <div style={{ background: 'var(--bg-card-inner)', border: '1px solid var(--bg-card-border)', padding: '16px', borderRadius: '8px', color: 'var(--text-primary)', fontSize: '0.9rem', lineHeight: '1.6' }}>
                   {result.llm_response}
                 </div>
               )}
@@ -234,7 +236,7 @@ export const EmployeeChatPage: React.FC = () => {
                 key={item.id}
                 style={{
                   padding: '12px',
-                  background: 'rgba(255, 255, 255, 0.02)',
+                  background: 'var(--bg-card-inner)',
                   border: '1px solid var(--bg-card-border)',
                   borderRadius: '8px',
                   display: 'flex',
@@ -250,7 +252,7 @@ export const EmployeeChatPage: React.FC = () => {
                     Score: {item.risk_score}
                   </span>
                 </div>
-                <div style={{ fontSize: '0.8rem', color: '#cbd5e1', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                <div style={{ fontSize: '0.8rem', color: 'var(--text-secondary)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
                   {item.masked_prompt}
                 </div>
                 <div style={{ fontSize: '0.7rem', color: 'var(--text-muted)' }}>

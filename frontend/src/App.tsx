@@ -1,6 +1,9 @@
 import React from 'react';
 import { BrowserRouter, Routes, Route, Navigate, Link, useLocation } from 'react-router-dom';
 import { AuthProvider, useAuth } from './contexts/AuthContext';
+import { ThemeProvider } from './contexts/ThemeContext';
+import { ThemeToggle } from './components/ThemeToggle';
+import { LandingPage } from './pages/LandingPage';
 import { LoginPage } from './pages/LoginPage';
 import { EmployeeChatPage } from './pages/EmployeeChatPage';
 import { ManagerDashboard } from './pages/ManagerDashboard';
@@ -13,13 +16,18 @@ const ProtectedRoute: React.FC<{ children: React.ReactNode; allowedRoles?: strin
 }) => {
   const { user, loading } = useAuth();
   if (loading) {
-    return <div style={{ textAlign: 'center', padding: '100px', color: 'var(--text-muted)' }}>Loading Sentinel...</div>;
+    return (
+      <div style={{ textAlign: 'center', padding: '120px 20px', color: 'var(--text-muted)' }}>
+        <div style={{ fontSize: '2rem', marginBottom: '12px' }}>🛡️</div>
+        <div>Verifying Sentinel credentials...</div>
+      </div>
+    );
   }
   if (!user) {
     return <Navigate to="/login" replace />;
   }
   if (allowedRoles && !allowedRoles.includes(user.role)) {
-    return <Navigate to="/" replace />;
+    return <Navigate to="/gateway" replace />;
   }
   return <>{children}</>;
 };
@@ -28,17 +36,26 @@ const Navigation: React.FC = () => {
   const { user, logout, switchDemoUser } = useAuth();
   const location = useLocation();
 
-  if (!user || location.pathname === '/login') return null;
+  // On the standalone landing page or login page, custom navigation is rendered
+  if (!user || location.pathname === '/login' || location.pathname === '/') return null;
 
   return (
     <header className="navbar">
       <div style={{ display: 'flex', alignItems: 'center', gap: '32px' }}>
         <Link to="/" className="brand">
-          <span>🛡️ Sentinel</span>
-          <span className="brand-badge">Gateway</span>
+          <div className="logo-icon-wrap" style={{ width: '32px', height: '32px' }}>
+            <span style={{ fontSize: '1.1rem' }}>🛡️</span>
+          </div>
+          <span style={{ fontWeight: 800, letterSpacing: '-0.02em' }}>Sentinel</span>
+          <span className="brand-badge" style={{ background: 'var(--primary)', color: 'var(--primary-contrast)', fontSize: '0.7rem', padding: '2px 6px', borderRadius: '4px', fontWeight: 700 }}>
+            Gateway
+          </span>
         </Link>
         <nav className="nav-links">
-          <Link to="/" className={`nav-item ${location.pathname === '/' ? 'active' : ''}`}>
+          <Link to="/" className="nav-item">
+            🌐 3D Landing
+          </Link>
+          <Link to="/gateway" className={`nav-item ${location.pathname === '/gateway' ? 'active' : ''}`}>
             Prompt Gateway
           </Link>
           {(user.role === 'manager' || user.role === 'admin') && (
@@ -59,16 +76,16 @@ const Navigation: React.FC = () => {
         </nav>
       </div>
 
-      <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
-        {/* Quick Demo Switcher in Navbar for Convenience */}
-        <div style={{ display: 'flex', alignItems: 'center', gap: '6px', background: 'rgba(255,255,255,0.03)', padding: '4px 8px', borderRadius: '8px', border: '1px solid var(--bg-card-border)' }}>
-          <span style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>Switch:</span>
+      <div style={{ display: 'flex', alignItems: 'center', gap: '14px' }}>
+        {/* Quick Demo Switcher */}
+        <div style={{ display: 'flex', alignItems: 'center', gap: '6px', background: 'var(--bg-card-inner)', padding: '4px 8px', borderRadius: '8px', border: '1px solid var(--bg-card-border)' }}>
+          <span style={{ fontSize: '0.72rem', color: 'var(--text-muted)' }}>Role:</span>
           {(['employee', 'manager', 'hr', 'admin'] as const).map((r) => (
             <button
               key={r}
               type="button"
               className={`btn btn-secondary ${user.role === r ? 'btn-primary' : ''}`}
-              style={{ padding: '3px 8px', fontSize: '0.75rem', textTransform: 'capitalize' }}
+              style={{ padding: '3px 8px', fontSize: '0.72rem', textTransform: 'capitalize' }}
               onClick={() => switchDemoUser(r)}
             >
               {r}
@@ -76,12 +93,20 @@ const Navigation: React.FC = () => {
           ))}
         </div>
 
+        {/* Theme Toggle Button */}
+        <ThemeToggle showLabel={false} />
+
         <div className="user-badge">
           <span>{user.username}</span>
           <span className={`role-pill role-${user.role}`}>{user.role}</span>
         </div>
 
-        <button type="button" className="btn btn-secondary" style={{ padding: '6px 12px', fontSize: '0.8rem' }} onClick={logout}>
+        <button
+          type="button"
+          className="btn btn-secondary"
+          style={{ padding: '6px 12px', fontSize: '0.8rem' }}
+          onClick={logout}
+        >
           Logout
         </button>
       </div>
@@ -93,22 +118,32 @@ export const AppContent: React.FC = () => {
   return (
     <div className="app-container">
       <Navigation />
-      <main className="main-content">
+      <main className="main-content" style={{ padding: 0, maxWidth: '100%' }}>
         <Routes>
+          {/* Public Landing Page with Three.js */}
+          <Route path="/" element={<LandingPage />} />
+          <Route path="/landing" element={<LandingPage />} />
           <Route path="/login" element={<LoginPage />} />
+
+          {/* Authenticated Routes */}
           <Route
-            path="/"
+            path="/gateway"
             element={
               <ProtectedRoute>
-                <EmployeeChatPage />
+                <div style={{ maxWidth: '1400px', margin: '0 auto', padding: '32px 24px' }}>
+                  <EmployeeChatPage />
+                </div>
               </ProtectedRoute>
             }
           />
+          <Route path="/chat" element={<Navigate to="/gateway" replace />} />
           <Route
             path="/manager"
             element={
               <ProtectedRoute allowedRoles={['manager', 'admin']}>
-                <ManagerDashboard />
+                <div style={{ maxWidth: '1400px', margin: '0 auto', padding: '32px 24px' }}>
+                  <ManagerDashboard />
+                </div>
               </ProtectedRoute>
             }
           />
@@ -116,7 +151,9 @@ export const AppContent: React.FC = () => {
             path="/hr"
             element={
               <ProtectedRoute allowedRoles={['hr', 'admin']}>
-                <HRDashboard />
+                <div style={{ maxWidth: '1400px', margin: '0 auto', padding: '32px 24px' }}>
+                  <HRDashboard />
+                </div>
               </ProtectedRoute>
             }
           />
@@ -124,7 +161,9 @@ export const AppContent: React.FC = () => {
             path="/admin"
             element={
               <ProtectedRoute allowedRoles={['admin']}>
-                <AdminPanel />
+                <div style={{ maxWidth: '1400px', margin: '0 auto', padding: '32px 24px' }}>
+                  <AdminPanel />
+                </div>
               </ProtectedRoute>
             }
           />
@@ -137,10 +176,12 @@ export const AppContent: React.FC = () => {
 
 export default function App() {
   return (
-    <AuthProvider>
-      <BrowserRouter>
-        <AppContent />
-      </BrowserRouter>
-    </AuthProvider>
+    <ThemeProvider>
+      <AuthProvider>
+        <BrowserRouter>
+          <AppContent />
+        </BrowserRouter>
+      </AuthProvider>
+    </ThemeProvider>
   );
 }

@@ -58,9 +58,9 @@ export const ManagerDashboard: React.FC = () => {
               padding: '12px 16px',
               borderRadius: '8px',
               marginBottom: '16px',
-              background: message.type === 'success' ? 'rgba(16, 185, 129, 0.15)' : 'rgba(239, 68, 68, 0.15)',
-              border: `1px solid ${message.type === 'success' ? 'rgba(16, 185, 129, 0.3)' : 'rgba(239, 68, 68, 0.3)'}`,
-              color: message.type === 'success' ? '#34d399' : '#f87171',
+              background: message.type === 'success' ? 'var(--color-success-bg)' : 'var(--color-danger-bg)',
+              border: `1px solid ${message.type === 'success' ? 'var(--color-success-border)' : 'var(--color-danger-border)'}`,
+              color: message.type === 'success' ? 'var(--color-success)' : 'var(--color-danger)',
               fontSize: '0.9rem',
             }}
           >
@@ -75,7 +75,7 @@ export const ManagerDashboard: React.FC = () => {
         ) : escalations.length === 0 ? (
           <div style={{ textAlign: 'center', padding: '48px 0', color: 'var(--text-muted)' }}>
             <div style={{ fontSize: '2rem', marginBottom: '8px' }}>🎉</div>
-            <div style={{ fontSize: '1.1rem', fontWeight: 600, color: '#fff' }}>No Pending Escalations</div>
+            <div style={{ fontSize: '1.1rem', fontWeight: 600, color: 'var(--text-heading)' }}>No Pending Escalations</div>
             <div style={{ fontSize: '0.85rem', marginTop: '4px' }}>All employee prompts are currently within policy thresholds.</div>
           </div>
         ) : (
@@ -84,7 +84,7 @@ export const ManagerDashboard: React.FC = () => {
               <div
                 key={item.id}
                 style={{
-                  background: 'rgba(255, 255, 255, 0.02)',
+                  background: 'var(--bg-card-inner)',
                   border: '1px solid var(--bg-card-border)',
                   borderRadius: '10px',
                   padding: '20px',
@@ -95,11 +95,11 @@ export const ManagerDashboard: React.FC = () => {
               >
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                   <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-                    <span className="action-badge action-escalate">ESCALATED</span>
-                    <span style={{ fontWeight: 600, color: '#fff' }}>User: {item.username}</span>
+                    <span className="action-badge action-escalated">ESCALATED</span>
+                    <span style={{ fontWeight: 600, color: 'var(--text-heading)' }}>User: {item.username}</span>
                     <span style={{ fontSize: '0.8rem', color: 'var(--text-muted)' }}>({item.department})</span>
                   </div>
-                  <div style={{ fontSize: '0.85rem', color: '#f59e0b', fontWeight: 700 }}>
+                  <div style={{ fontSize: '0.85rem', color: 'var(--color-warning)', fontWeight: 700 }}>
                     Risk Score: {item.risk_score}/100
                   </div>
                 </div>
@@ -108,7 +108,7 @@ export const ManagerDashboard: React.FC = () => {
                   <div style={{ fontSize: '0.75rem', fontWeight: 700, color: 'var(--text-muted)', textTransform: 'uppercase', marginBottom: '4px' }}>
                     Sanitized Prompt Preview:
                   </div>
-                  <div style={{ background: 'rgba(10, 13, 20, 0.7)', padding: '12px', borderRadius: '6px', fontFamily: 'monospace', fontSize: '0.85rem', color: '#38bdf8' }}>
+                  <div style={{ background: 'var(--bg-card)', padding: '12px', borderRadius: '6px', border: '1px solid var(--bg-card-border)', fontFamily: 'monospace', fontSize: '0.85rem', color: 'var(--primary)' }}>
                     {item.masked_prompt}
                   </div>
                 </div>
@@ -118,7 +118,7 @@ export const ManagerDashboard: React.FC = () => {
                     <div style={{ fontSize: '0.75rem', fontWeight: 700, color: 'var(--text-muted)', textTransform: 'uppercase', marginBottom: '4px' }}>
                       Flagged Reasons:
                     </div>
-                    <ul style={{ paddingLeft: '18px', fontSize: '0.85rem', color: '#e2e8f0' }}>
+                    <ul style={{ paddingLeft: '18px', fontSize: '0.85rem', color: 'var(--text-secondary)' }}>
                       {item.risk_factors.map((f, i) => (
                         <li key={i}>{f}</li>
                       ))}
